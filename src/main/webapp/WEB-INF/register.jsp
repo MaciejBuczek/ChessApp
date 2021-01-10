@@ -40,9 +40,9 @@
 	</head>
 	<body>
 	
-	<h2>Login</h2>
+	<h2>Register</h2>
 	
-		<form action="/login" method="post">
+		<form action="register" method="post">
 		  <div class="container">
 		    <label for="login"><b>Username</b></label>
 		    <input type="text" placeholder="Enter Username" name="login" required>
@@ -50,11 +50,11 @@
 		    <label for="password"><b>Password</b></label>
 		    <input type="password" placeholder="Enter Password" name="password" required>
 		        
-		    <button type="submit">Login</button>
+		    <button type="submit">Register</button>
 		  </div>
 		
 		  <div class="container" style="background-color:#f1f1f1">
-		    <span class="psw">Feel Free to <a href="registerForm">Register</a></span>
+		    <span class="psw">Back to <a href="/">Login</a></span>
 		  </div>
 		</form>
 	
