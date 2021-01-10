@@ -44,8 +44,6 @@ public class GameService {
 		
 		GameStorage.getInstance().setGame(game);
 		
-		printBoard(game.getBoard());
-		
 		return game;
 	}
 	
@@ -154,22 +152,38 @@ public class GameService {
 	}
 	
 	private void processMove(Game game, GameMove move) {
+		
+		if(game.getBoard()[move.getNewY()][move.getNewX()].getValue() > 0) {
+			if(game.isPlayer1White())
+				removePlayerPiece(game.getPlayer1Pieces(), game.getBoard()[move.getNewY()][move.getNewX()]);
+			else
+				removePlayerPiece(game.getPlayer2Pieces(), game.getBoard()[move.getNewY()][move.getNewX()]);
+		}
+		else if(game.getBoard()[move.getNewY()][move.getNewX()].getValue() < 0) {
+			if(!game.isPlayer1White())
+				removePlayerPiece(game.getPlayer1Pieces(), game.getBoard()[move.getNewY()][move.getNewX()]);
+			else
+				removePlayerPiece(game.getPlayer2Pieces(), game.getBoard()[move.getNewY()][move.getNewX()]);
+		}
+		
 		game.getBoard()[move.getNewY()][move.getNewX()] = new Piece(move.getPiece());
 		game.getBoard()[move.getPrevY()][move.getPrevX()] = new Piece(PieceInfo.NO_PIECE);
 		
-		printBoard(game.getBoard());
+	}
+	
+	private void removePlayerPiece(Piece[][] playerPieces, Piece piece) {
+		for(int i=0; i< playerPieces.length; i++) {
+			for(int j =0 ; j< playerPieces[i].length; j++) {
+				if(playerPieces[i][j].getValue() == piece.getValue()) {
+					playerPieces[i][j] = new Piece(PieceInfo.NO_PIECE);
+					break;
+				}
+			}
+		}
 	}
 	
 	private boolean checkForWinner(Piece[][] playerPieces) {
 		return playerPieces[1][4].getValue() == PieceInfo.NO_PIECE.getValue();
 	}
-	
-	private void printBoard(Piece[][] board) {
-		for(var row : board) {
-			for(var piece : row) {
-				System.out.print(piece.getSymbol() + " ");
-			}
-			System.out.print('\n');
-		}
-	}
+
 }

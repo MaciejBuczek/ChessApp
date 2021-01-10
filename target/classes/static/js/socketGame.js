@@ -5,13 +5,17 @@ let gameId;
 
 function connectToSocket(gameId){
 	console.log("Connectiong to the game");
-	let socket = new SockJS(url + "gameTurn");
+	let socket = new SockJS(url + "/gameTurn");
 	stompClient = Stomp.over(socket);
 	stompClient.connect({}, function(frame){
 		console.log("connected to the frame:" + frame);
 		stompClient.subscribe("/topic/gameProgress/" + gameId, function(response){
 			let data = JSON.parse(response.body);
-			console.log(data);
+			console.log("response!");
+			turn++;
+			refreshView(data);
+			isSelectedPrev = false;
+			isSelectedNew = false;
 		})
 	})
 }
@@ -34,7 +38,7 @@ function create(){
 				
 				isWhite = data.player1White;
 				refreshView(data)
-				//player type board reset
+				
 				connectToSocket(gameId);
 				alert("Game lobby created \n Lobby id: " + data.gameId);
 			},
@@ -46,11 +50,11 @@ function create(){
 }
 
 function connect(){
-	let login = document.getElementById("login").vaule;
-	let gameId = documeng.getElementById("gameId").vaule;
+	let login = document.getElementById("login").value;
+	let gameIdInput = document.getElementById("gameId").value;
 	if(login == null || login === '')
 		alert("Please eneter a login");
-	else if(gameId == null || gameId === '')
+	else if(gameIdInput == null || gameIdInput === '')
 		alert("Please eneter a gameID");
 	else{
 		$.ajax({
@@ -62,11 +66,14 @@ function connect(){
 				"player" : {
 					"login" : login
 				},
-				"gameId" : gameId
+				"gameId" : gameIdInput
 			}),
 			success: function(data){
 				gameId = data.gameId;
-				//player type board reset
+				
+				isWhite = !data.player1White;
+				refreshView(data)
+				
 				connectToSocket(gameId);
 				alert("Connected \n You are playing with " + data.player1.login);
 			},
@@ -77,8 +84,8 @@ function connect(){
 	}
 }
 
-function connectToRandom(){
-	let login = document.getElementById("login").vaule;
+function connectRandom(){
+	let login = document.getElementById("login").value;
 	if(login == null || login === ''){
 		alert("Please eneter a login");
 	}else{
@@ -92,7 +99,10 @@ function connectToRandom(){
 			}),
 			success: function(data){
 				gameId = data.gameId;
-				//player type board reset
+				
+				isWhite = !data.player1White;
+				refreshView(data)
+				
 				connectToSocket(gameId);
 				alert("Connected \n You are playing with " + data.player1.login);
 			},
@@ -106,7 +116,7 @@ function connectToRandom(){
 function makeMove(pieceType, newX, newY, oldX, oldY){
 
 	$.ajax({
-		url: url + "/game/connect/gameTurn",
+		url: url + "/game/gameTurn",
 		type: 'POST',
 		dataType: "json",
 		contentType: "application/json",
@@ -120,8 +130,6 @@ function makeMove(pieceType, newX, newY, oldX, oldY){
 		}),
 		success: function(data){
 			refreshView(data);
-			
-			alert("Connected \n You are playing with " + data.player1.login);
 		},
 		error: function(error){
 			console.log(error);
@@ -139,7 +147,7 @@ function refreshView(data){
 	
 	document.getElementById("player1").innerHTML = data.player1.login;
 	if(data.player2 != null)
-		document.getElementById("player1").innerHTML = data.player2.login;
+		document.getElementById("player2").innerHTML = data.player2.login;
 	
 	for(let i = 0; i <player1Pieces.length; i++){
 		for(let j=0; j<player1Pieces[i].length; j++){

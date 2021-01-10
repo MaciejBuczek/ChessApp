@@ -28,12 +28,12 @@ let blackMap = [
 	"KING_BLACK"
 ];
 
-var isTurn = true;
+var turn = 1;
 var isWhite;
 var player1Pieces;
 var player2Pieces;
-let isSelectedPrev = false;
-let isSelectedNew = false;
+var isSelectedPrev = false;
+var isSelectedNew = false;
 let prevVal, nextVal;
 let piece;
 let prevX, prevY, newY, newX;
@@ -64,7 +64,7 @@ function getPiece(value){
 }
 
 function selectPiece(element){
-	if(isTurn){
+	if((isWhite && (turn%2 == 1)) || (!isWhite && (turn%2 == 0))){
 		let tempY = parseInt(element.id.charAt(0));
 		let tempX = parseInt(element.id.charAt(2));
 		if(!isSelectedPrev){
@@ -93,6 +93,8 @@ function selectPiece(element){
 				isSelectedNew = true;
 				piece = getPiece(prevVal);
 				isTurn = false;
+				removeSelectedClass(document.getElementById(prevY+"_"+prevX));
+				makeMove(piece, newX, newY, prevX, prevY);
 			}
 		}
 	}

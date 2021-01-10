@@ -10,14 +10,14 @@ body{
 }
 
 .playerPieces{
-	width:480px;
+	width:640px;
 	margin: 20px;
     border: 12px solid #333;
     float:left;
 }
 
 #player1, #player2{
-	width:480px;
+	width:640px;
 	margin:20px;
 	margin-bottom:0;
     float:left;
@@ -49,12 +49,6 @@ body{
     text-align:center;
     display: table-cell;
     vertical-align:middle;
-}
-
-.player{
-	width:60px;
-	height:60px;
-	font-size:40px;
 }
 
 .blackSelected {
