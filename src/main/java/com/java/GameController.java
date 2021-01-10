@@ -47,7 +47,7 @@ public class GameController {
 	public ResponseEntity<Game> gameTurn(@RequestBody GameMove gameMove) throws Exception{
 		log.info("game move {}", gameMove);
 		Game game = gameService.gameTurn(gameMove);
-		simpMessagingTemplate.convertAndSend("/topic/game-progress/"+game.getGameId(),game);
+		simpMessagingTemplate.convertAndSend("/topic/gameProgress/"+game.getGameId(),game);
 		return ResponseEntity.ok(game);
 	} 
 }
