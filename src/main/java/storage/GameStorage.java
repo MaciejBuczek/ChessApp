@@ -40,4 +40,12 @@ public class GameStorage {
 	public void setGame(Game game) {
 		games.put(game.getGameId(), game);
 	}
+	
+	public boolean isIdCorrect(String gameId) {
+		return !(games.get(gameId) == null);
+	}
+	
+	public boolean areAvilableGames() {
+		return !(games.values().stream().filter(g -> g.getGamestatus().equals(GameStatus.NEW)).findFirst().orElse(null) == null);
+	}
 }

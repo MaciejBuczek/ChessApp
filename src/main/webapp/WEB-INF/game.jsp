@@ -1,6 +1,7 @@
  <!DOCTYPE html>
 <html>
 	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<style>
 			body{
 				background-color:#343a40; 
@@ -76,13 +77,14 @@
 			  	background: #e6e6e6;
 			}
 		</style>
-	    <!--    libs for stomp and sockjs-->
 	    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
 	    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-	    <!--    end libs for stomp and sockjs-->
 	    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	</head>
 	<body style="-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;">
+	 <input type="hidden" id="action" name="custId" value="${ action }">
+	 <input type="hidden" id="login" name="custId" value="${ login }">
+	 <input type="hidden" id="gameId" name="custId" value="${ gameId }">
 	<div class="chessboard">
 
 			<div class="white" id="0_0" onclick="selectPiece(this)"></div>
@@ -202,18 +204,6 @@
   			<div class = "playerBlack player" id = "p2_1_6"></div>
   			<div class = "playerWhite player" id = "p2_1_7"></div>
   		</div>
-  	</div>
-  	<div id="inputDiv">
-  		<input type="text" id = "login" placeholder = "login">
-  		<br/>
-  		<button onclick="create()">Create new lobby</button>
-  		<br/>
-  		<button onclick="connectRandom()">Connect to random lobby</button>
-  		<br/>
-  		<input id="gameId" placeholder = "game ID">
-  		<br/>
-  		<button onclick="connect()">Connect to lobby</button>
-  		<br/>
   	</div>
   	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
   	<script>
@@ -349,6 +339,21 @@
 			})
 		}
 		
+		function displayCreateInfo(gameId){
+			let html = "<h2>Your game id:</h2><input type=\"text\" value=" + gameId+  " readonly style = \"width:400px; font-size:20px;\">";
+			Swal.fire({
+			  title: '<strong>Game created successfully!</strong>',
+			  icon: 'success',
+			  html:
+			    html,
+			  showCloseButton: true,
+			  focusConfirm: false,
+			  confirmButtonText:
+			    'ok',
+			  confirmButtonAriaLabel: 'Thumbs up, great!',
+			})
+		}
+		
 		function create(){
 			let login = document.getElementById("login").value;
 			if(login == null || login === ''){
@@ -369,13 +374,28 @@
 						refreshView(data)
 						
 						connectToSocket(gameId);
-						alert("Game lobby created \n Lobby id: " + data.gameId);
+						displayCreateInfo(data.gameId);
 					},
 					error: function(error){
 						console.log(error);
 					}
 				})
 			}
+		}
+		
+		function displayPlayer(player){
+			let html = "<h2>You are playing with <strong>" + player +  "</strong> <h2\">";
+			Swal.fire({
+			  title: '<strong>Connect to game successfully!</strong>',
+			  icon: 'success',
+			  html:
+			    html,
+			  showCloseButton: true,
+			  focusConfirm: false,
+			  confirmButtonText:
+			    'ok',
+			  confirmButtonAriaLabel: 'Thumbs up, great!',
+			})
 		}
 		
 		function connect(){
@@ -404,7 +424,8 @@
 						refreshView(data)
 						
 						connectToSocket(gameId);
-						alert("Connected \n You are playing with " + data.player1.login);
+						
+						displayPlayer(data.player1.login);
 					},
 					error: function(error){
 						console.log(error);
@@ -433,7 +454,7 @@
 						refreshView(data)
 						
 						connectToSocket(gameId);
-						alert("Connected \n You are playing with " + data.player1.login);
+						displayPlayer(player.login);
 					},
 					error: function(error){
 						console.log(error);
@@ -500,6 +521,17 @@
 				}
 			}
 		}
+  	</script>
+  	<script>
+  		(function() {
+  			let action = document.getElementById("action").value;
+  			if(action == "create")
+  				create();
+  			else if(action == "connect")
+  				connect();
+  			else if(action == "connectRandom")		
+  				connectRandom();	
+		})();
   	</script>
 	</body>
 </html> 

@@ -13,6 +13,7 @@ import com.java.model.Piece;
 import com.java.model.PieceInfo;
 import com.java.model.Player;
 
+import controller.dto.GameFindRequest;
 import lombok.AllArgsConstructor;
 import storage.GameStorage;
 
@@ -91,6 +92,13 @@ public class GameService {
 		GameStorage.getInstance().setGame(game);
 		
 		return game;
+	}
+	
+	public GameFindRequest validateGame(String id) {
+		GameFindRequest gameFindRequest = new GameFindRequest();
+		gameFindRequest.setIsCorrectID(GameStorage.getInstance().isIdCorrect(id));
+		gameFindRequest.setAreAvilableGames(GameStorage.getInstance().areAvilableGames());
+		return gameFindRequest;
 	}
 	
 	private Piece[][] getWhitePieces() {

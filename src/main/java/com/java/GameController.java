@@ -13,6 +13,8 @@ import com.java.model.GameMove;
 import com.java.model.Player;
 
 import controller.dto.ConnectRequest;
+import controller.dto.GameFindRequest;
+import controller.dto.GameValidateRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,4 +52,11 @@ public class GameController {
 		simpMessagingTemplate.convertAndSend("/topic/gameProgress/"+game.getGameId(),game);
 		return ResponseEntity.ok(game);
 	} 
+	
+	@PostMapping("/vaidateId")
+	public ResponseEntity<GameFindRequest> validateId(@RequestBody GameValidateRequest request) throws Exception{
+		log.info("id validate request {}", request.getId());
+		return ResponseEntity.ok(gameService.validateGame(request.getId()));
+	} 
+	
 }

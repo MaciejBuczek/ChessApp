@@ -69,12 +69,5 @@ public class LoginController {
 		
 		return mv;
 	}
-
-	@RequestMapping("index")
-	public ModelAndView indexhtml() {
-		ModelAndView mv = new ModelAndView("index.jsp");
-		
-		return mv;
-	}
 	
 }

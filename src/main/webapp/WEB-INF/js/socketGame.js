@@ -20,6 +20,14 @@ function connectToSocket(gameId){
 	})
 }
 
+function displayCreateInfo(gameId){
+	Swal.fire(
+	  'Good job!',
+	  'You clicked the button!',
+	  'success'
+	)
+}
+
 function create(){
 	let login = document.getElementById("login").value;
 	if(login == null || login === ''){
@@ -38,9 +46,9 @@ function create(){
 				
 				isWhite = data.player1White;
 				refreshView(data)
+				displayCreateInfo();
 				
 				connectToSocket(gameId);
-				alert("Game lobby created \n Lobby id: " + data.gameId);
 			},
 			error: function(error){
 				console.log(error);
