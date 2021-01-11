@@ -99,3 +99,13 @@ function selectPiece(element){
 		}
 	}
 }
+
+function selectMove(value){
+	switch(value) {
+		case 1:
+		break;
+		case 1:
+		break;
+		
+	}
+}

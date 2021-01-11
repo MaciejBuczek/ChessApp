@@ -20,7 +20,7 @@ public class LoginController {
 	
 	@RequestMapping("/")
 	public ModelAndView index() {
-		ModelAndView mv = new ModelAndView("login");
+		ModelAndView mv = new ModelAndView("login.jsp");
 		
 		return mv;
 	}
@@ -28,7 +28,7 @@ public class LoginController {
 	@RequestMapping("login")
 	public ModelAndView login(@RequestParam("login") String login,
 								@RequestParam("password") String password) {
-		ModelAndView mv = new ModelAndView("login");
+		ModelAndView mv = new ModelAndView("login.jsp");
 		List<Player> player = null;
 		try {
 			player = repo.findByLogin(login);
@@ -37,7 +37,7 @@ public class LoginController {
 		}
 		if(player.size() != 0 && player.get(0).getPassword().equals(password)) {
 				mv.addObject("login", login);
-				mv.setViewName("home");
+				mv.setViewName("home.jsp");
 		}
 		
 		return mv;
@@ -45,7 +45,7 @@ public class LoginController {
 	
 	@RequestMapping("registerForm")
 	public ModelAndView register() {
-		ModelAndView mv = new ModelAndView("register");
+		ModelAndView mv = new ModelAndView("register.jsp");
 		
 		return mv;
 	}
@@ -53,7 +53,7 @@ public class LoginController {
 	@RequestMapping("register")
 	public ModelAndView register(@RequestParam("login") String login,
 								@RequestParam("password") String password) {
-		ModelAndView mv = new ModelAndView("register");
+		ModelAndView mv = new ModelAndView("register.jsp");
 		List<Player> player = null;
 		try {
 			player = repo.findByLogin(login);
@@ -64,10 +64,17 @@ public class LoginController {
 			Player temp = new Player(login, password);
 			repo.save(temp);
 			mv.addObject("login", login);
-			mv.setViewName("login");
+			mv.setViewName("login.jsp");
 		}
 		
 		return mv;
 	}
 
+	@RequestMapping("index")
+	public ModelAndView indexhtml() {
+		ModelAndView mv = new ModelAndView("index.jsp");
+		
+		return mv;
+	}
+	
 }
