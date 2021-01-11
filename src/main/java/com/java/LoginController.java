@@ -19,11 +19,11 @@ public class LoginController {
 	PlayerRepo repo;
 	
 	@RequestMapping("/")
-	public ModelAndView index() {
-		ModelAndView mv = new ModelAndView("login.jsp");
-		
-		return mv;
-	}
+    public ModelAndView index() {
+        ModelAndView mv = new ModelAndView("login.jsp");
+
+        return mv;
+    }
 	
 	@RequestMapping("login")
 	public ModelAndView login(@RequestParam("login") String login,
@@ -36,7 +36,15 @@ public class LoginController {
 			System.out.println(e.getMessage());
 		}
 		if(player.size() != 0 && player.get(0).getPassword().equals(password)) {
-				mv.addObject("login", login);
+				Player user = player.get(0);
+				List<Player> ordered = repo.findAllByOrderByScoreDesc();
+				for(int i = 0; i<ordered.size(); i++) {
+					if(ordered.get(i).getId() == user.getId()) {
+						mv.addObject("ranking", i);
+						break;
+					}
+				}
+				mv.addObject("player", user);
 				mv.setViewName("home.jsp");
 		}
 		

@@ -1,6 +1,8 @@
 
 
 <!DOCTYPE html>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <html>
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -37,6 +39,7 @@
 			float:left;
 			color:white;
 			margin:50px;
+			margin-left:200px;
 		}
 		#gamePanel > form > h1{
 			font-size:55px;
@@ -49,6 +52,9 @@
 			padding:10px;
 			width:480px;
 		}
+		input[type=submit]:hover{
+			background-color:#d5d9dd;
+		}
 		.button{
 			font-size:25px;		
 			padding:10px;
@@ -56,6 +62,7 @@
 			background-color:white;
 			text-align:center;
 			border:none;
+			cursor: pointer;
 		}
 		a > div:hover{
 			background-color:#e6e6e6;
@@ -69,6 +76,50 @@
 			color:white;
 			font-size:20px;
 		}
+		#statInfo{
+			float:left;
+			margin:70px;
+			color:white;
+			margin-left:300px;
+			
+		}
+		#statInfo > h1 {
+			font-size:55px;
+		}
+		#results{
+			padding:15px;
+		  	height: 300px;
+		  	overflow: auto;	
+		  	font-size:25px;
+		}
+		table {
+		  border-collapse: collapse;
+		  width: 100%;
+		}
+		
+		td, th {
+		  border: 1px solid #ddd;
+		  padding: 8px;
+		}
+		
+		tr:nth-child(even){
+			background-color: #454d54;
+		}
+		
+		tr:hover {
+			background-color: #5c6770;
+		}
+		
+		th {
+		  padding-top: 12px;
+		  padding-bottom: 12px;
+		  text-align: left;
+		  background-color: #22262a;
+		  color: white;
+		}
+		#ranking{
+			padding: 15px;
+		}
 		
 		</style>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
@@ -79,7 +130,7 @@
 		<div id = "nav">
 			<h1>ChessApp</h1>
 			<div id = "account">
-				<h3>Hello <span id ="login">${ login }</span></h3>
+				<h3>Hello <span id ="login">${ player.login }</span></h3>
 				<h6>Logout</h6>
 			</div>	
 		</div>	
@@ -103,6 +154,30 @@
 					<input type="submit" value = "Join to random game" class = "button"/>
 				</form>
 			</div>		
+		</div>
+		<div id = "statInfo">
+			<h1>Your ranking</h1>
+			<div id = "ranking">
+				<h2>Your score: &nbsp; &nbsp;<span style="font-weight:bold;">${ player.score }</span></h2>
+				<h2>Your current ranking position: &nbsp; &nbsp;<span style="font-weight:bold;">${ranking}</span></h2>
+			</div>
+			<h1>Game History</h1>
+			<div id = "results">
+				<table>
+					<tr>
+					   <th>Opponent Name</th>
+					   <th>Date</th>
+					   <th>Result</th>
+					 </tr>
+					<c:forEach items = "${player.results}" var = "result">
+						<tr>
+							<td>${result.oponentName}</td>
+							<td>${result.date}</td>
+							<td>${result.result}</td>
+						</tr>
+					</c:forEach>
+				</table>
+			</div>	
 		</div>		
 		<div id = "footer">Created by Maciej Buczek & Kamil Galuszka 2020</div>
 		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>

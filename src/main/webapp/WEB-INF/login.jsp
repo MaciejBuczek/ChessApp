@@ -3,8 +3,11 @@
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<style>
-		body {font-family: Arial, Helvetica, sans-serif;}
-		form {border: 3px solid #f1f1f1;}
+		body {
+			font-family: Arial, Helvetica, sans-serif;
+			background-color:#343a40; 
+			padding:100px;
+		}
 		
 		input[type=text], input[type=password] {
 		  width: 100%;
@@ -40,7 +43,8 @@
 	</head>
 	<body>
 	
-	<h2>Login</h2>
+	<h1>Welcome to ChessApp!</h1>
+	<h2>Please log in to continue</h2>
 	
 		<form action="/login" method="post">
 		  <div class="container">
