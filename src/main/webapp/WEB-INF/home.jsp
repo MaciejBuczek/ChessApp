@@ -137,19 +137,22 @@
 		<div>
 			<div id = "gamePanel">
 				<form action="/create" method="post">
-					<input type="hidden" name="login" value="${ login }">
+					<input type="hidden" name="login" value="${ player.login }">
+					<input type="hidden" name="id" value="${ player.id }">
 					<h1>Create New Game</h1>
 					<input type="submit" value ="Create a game" class = "button"/>
 				</form>
 				<form action="/connect" method="post">
-					<input type="hidden" name="login" value="${ login }">
+					<input type="hidden" name="login" value="${ player.login }">
+					<input type="hidden" name="id" value="${ player.id }">
 					<h1>Join Existing</h1>
 					<input type="text" id = "gameId" name = "gameId" placeholder = "game id">
 					<br/><br/>
 					<input type="submit" onclick = "return validateId()" value = "Join to game" class = "button"/>
 				</form>
 				<form action="/connectRandom" method="post">
-					<input type="hidden" name="login" value="${ login }">
+					<input type="hidden" name="login" value="${ player.login }">
+					<input type="hidden" name="id" value="${ player.id }">
 					<h1>Join Random Game</h1>
 					<input type="submit" value = "Join to random game" class = "button"/>
 				</form>

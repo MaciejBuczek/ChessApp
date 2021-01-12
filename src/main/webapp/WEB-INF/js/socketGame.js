@@ -20,6 +20,8 @@ function connectToSocket(gameId){
 	})
 }
 
+
+
 function displayCreateInfo(gameId){
 	Swal.fire(
 	  'Good job!',

@@ -9,28 +9,31 @@ import org.springframework.web.servlet.ModelAndView;
 public class GamePageController {
 	
 	@RequestMapping("create")
-	public ModelAndView create(@RequestParam("login") String login) {
+	public ModelAndView create(@RequestParam("login") String login, @RequestParam("id") String id) {
 		ModelAndView mv = new ModelAndView("game.jsp");
 		mv.addObject("action", "create");
 		mv.addObject("login", login);
+		mv.addObject("id", Integer.parseInt(id));
 		mv.addObject("gameId", "0");
 		mv.setViewName("game.jsp");
 		return mv;
 	}
 	@RequestMapping("connect")
-	public ModelAndView connect(@RequestParam("login") String login, @RequestParam("gameId") String gameId) {
+	public ModelAndView connect(@RequestParam("login") String login, @RequestParam("gameId") String gameId, @RequestParam("id") String id) {
 		ModelAndView mv = new ModelAndView("game.jsp");
 		mv.addObject("action", "connect");
 		mv.addObject("login", login);
+		mv.addObject("id", Integer.parseInt(id));
 		mv.addObject("gameId", gameId);
 		mv.setViewName("game.jsp");
 		return mv;
 	}
 	@RequestMapping("connectRandom")
-	public ModelAndView connectRandom(@RequestParam("login") String login) {
+	public ModelAndView connectRandom(@RequestParam("login") String login, @RequestParam("id") String id) {
 		ModelAndView mv = new ModelAndView("game.jsp");
 		mv.addObject("action", "connectRandom");
 		mv.addObject("login", login);
+		mv.addObject("id", Integer.parseInt(id));
 		mv.addObject("gameId", "0");
 		mv.setViewName("game.jsp");
 		return mv;

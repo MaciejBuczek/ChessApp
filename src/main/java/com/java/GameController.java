@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.java.model.Game;
 import com.java.model.GameMove;
+import com.java.model.Message;
 import com.java.model.Player;
 
 import controller.dto.ConnectRequest;
@@ -58,5 +59,12 @@ public class GameController {
 		log.info("id validate request {}", request.getId());
 		return ResponseEntity.ok(gameService.validateGame(request.getId()));
 	} 
+	
+	@PostMapping("/sendMessage")
+	public ResponseEntity<Message> sendMessage(@RequestBody Message message){
+		log.info("send message request {}", message);
+		simpMessagingTemplate.convertAndSend("/topic/message/"+message.getRecievierId(), message);
+		return ResponseEntity.ok(message);
+	}
 	
 }

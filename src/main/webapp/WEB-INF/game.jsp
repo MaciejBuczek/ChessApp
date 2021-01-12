@@ -4,11 +4,14 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<style>
 			body{
-				background-color:#343a40; 
+				background-color:#343a40;
+				font-family: Helvetica, sans-serif; 
+				margin:0;
+				padding:0;
 			}
 			.chessboard {
-			    width: 640px;
-			    height: 640px;
+			    width: 840px;
+			    height: 840px;
 			    margin: 20px;
 			    border: 25px solid #333;
 			    float:left;
@@ -27,7 +30,11 @@
 				margin-bottom:0;
 			    float:left;
 			    color:white;
+			    font-size:30px;
 			    font-weight:bold;
+			}
+			#player2{
+				margin-top:0;
 			}
 			
 			#inputDiv{
@@ -37,23 +44,29 @@
 			}
 			.black, .playerBlack{
 			    float: left;
-			    width: 80px;
-			    height: 80px;
+			    width: 105px;
+			    height: 105px;
 			    background-color: #999;
-			    font-size:50px;
+			    font-size:65px;
 			    text-align:center;
 			    display: table-cell;
 			    vertical-align:middle;
 			}
 			.white, .playerWhite{
 			    float: left;
-			    width: 80px;
-			    height: 80px;
+			    width: 105px;
+			    height: 105px;
 			    background-color: #fff;
-			    font-size:50px;
+			    font-size:65px;
 			    text-align:center;
 			    display: table-cell;
 			    vertical-align:middle;
+			}
+			
+			.playerBlack, .playerWhite{
+				width:80px;
+				height:80px;
+				font-size:50px;
 			}
 			
 			.blackSelected {
@@ -76,15 +89,63 @@
 				cursor: pointer;
 			  	background: #e6e6e6;
 			}
+			#chatBox{
+				width:612px;
+				height:220px;
+				padding:15px;
+			    color:white;
+			    background-color:#505962;
+			    overflow: auto;
+			}
+			button{
+				width:100%;
+				border:none;
+				font-size:20px;
+				font-weight:bold;
+				padding:10px;
+				cursor:pointer;
+			}
+			button:hover{
+				background-color:#d5d9dd;
+			}
+			#messageBox{
+				width:637px;
+				font-size:25px;
+			}
+			#blockDiv{
+				position:absolute;
+				top:250px;
+				z-index: 10;
+				width:100%;
+				height:25%;
+				background-color:#505962;
+				border-top: 25px solid #333;
+				border-bottom: 25px solid #333;
+				color:white;
+			}
+			#blockDiv > h1{
+				text-align: center;
+				font-size: 50px;
+			}
+			#blockDiv > button{
+				width:50%;
+				margin-left:25%;
+			}
+			
 		</style>
 	    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
 	    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 	    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	</head>
 	<body style="-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;">
-	 <input type="hidden" id="action" name="custId" value="${ action }">
-	 <input type="hidden" id="login" name="custId" value="${ login }">
-	 <input type="hidden" id="gameId" name="custId" value="${ gameId }">
+	<input type="hidden" id="action" value="${ action }">
+	<input type="hidden" id="login" value="${ login }">
+	<input type="hidden" id="id" value ="${id}">
+	<input type="hidden" id="gameId" value="${ gameId }">
+	<div id ="blockDiv">
+		<h1 id ="blockText">Waiting for other player to join...</h1>
+		<button id ="startBtn" onclick = "sendInitialMessage()">Begin game</button>
+	</div>
 	<div class="chessboard">
 
 			<div class="white" id="0_0" onclick="selectPiece(this)"></div>
@@ -205,7 +266,23 @@
   			<div class = "playerWhite player" id = "p2_1_7"></div>
   		</div>
   	</div>
+  	<div style = "float:left; margin:20px; border: 12px solid #333;">
+  		<div id = "chatBox">
+  			Waiting for other player to join	
+  		</div>
+  		<input id = "messageBox">
+  		<br/>
+  		<button onclick = "prepareMessage()">Send Message</button>
+  	</div>
+
   	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  	<script>
+  		var oponentId;
+  		var playerId;
+  		var isSecondPlayerConnected = false;
+  		var isFirstPlayerConnected = false;
+  		var login;
+  	</script>
   	<script>
   		var board = [
 			[0,0,0,0,0,0,0,0],
@@ -365,16 +442,22 @@
 					dataType: "json",
 					contentType: "application/json",
 					data : JSON.stringify({
-						"login" : login
+						"login" : login,
+						"id" : playerId
 					}),
 					success: function(data){
+						isFirstPlayerConnected = true;
+						login = data.player1.login;
 						gameId = data.gameId;
 						
 						isWhite = data.player1White;
 						refreshView(data)
 						
 						connectToSocket(gameId);
+						connectToChatSocket(playerId);
+						
 						displayCreateInfo(data.gameId);
+						document.getElementById("startBtn").style.display = "none";
 					},
 					error: function(error){
 						console.log(error);
@@ -399,7 +482,7 @@
 		}
 		
 		function connect(){
-			let login = document.getElementById("login").value;
+			login = document.getElementById("login").value;
 			let gameIdInput = document.getElementById("gameId").value;
 			if(login == null || login === '')
 				alert("Please eneter a login");
@@ -413,19 +496,25 @@
 					contentType: "application/json",
 					data : JSON.stringify({
 						"player" : {
-							"login" : login
+							"login" : login,
+							"id" : playerId
 						},
 						"gameId" : gameIdInput
 					}),
 					success: function(data){
+						login = data.player2.login;
 						gameId = data.gameId;
 						
 						isWhite = !data.player1White;
 						refreshView(data)
 						
 						connectToSocket(gameId);
+						oponentId = data.player1.id;
+						isSecondPlayerConnected = true;		
 						
 						displayPlayer(data.player1.login);
+						document.getElementById("chatBox").innerHTML = '';
+						document.getElementById("blockText").innerHTML = "Game ready to start"; 
 					},
 					error: function(error){
 						console.log(error);
@@ -435,7 +524,7 @@
 		}
 		
 		function connectRandom(){
-			let login = document.getElementById("login").value;
+			login = document.getElementById("login").value;
 			if(login == null || login === ''){
 				alert("Please eneter a login");
 			}else{
@@ -448,19 +537,32 @@
 						"login" : login
 					}),
 					success: function(data){
+						login = data.player2.login;
 						gameId = data.gameId;
 						
 						isWhite = !data.player1White;
 						refreshView(data)
 						
 						connectToSocket(gameId);
-						displayPlayer(player.login);
+										
+						oponentId = data.player1.id;
+						isSecondPlayerConnected = true;
+														
+						displayPlayer(data.player1.login);
+						document.getElementById("chatBox").innerHTML = '';
+						document.getElementById("blockText").innerHTML = "Game ready to start"; 
 					},
 					error: function(error){
 						console.log(error);
 					}
 				})
 			}
+		}
+		
+		function sendInitialMessage(){
+			document.getElementById("blockDiv").style.display = "none";
+			connectToChatSocket(playerId);
+			sendMessage(login+" "+playerId);
 		}
 		
 		function makeMove(pieceType, newX, newY, oldX, oldY){
@@ -521,9 +623,88 @@
 				}
 			}
 		}
+		
+		function connectToChatSocket(playerId){
+			console.log("Connectiong to the chat");
+			let socket = new SockJS(url + "/chat");
+			stompClient = Stomp.over(socket);
+			stompClient.connect({}, function(frame){
+				console.log("connected to the frame(CHAT):" + frame);
+				stompClient.subscribe("/topic/message/" + playerId, function(response){
+					let data = JSON.parse(response.body);
+					console.log("new message!");
+					if(!isSecondPlayerConnected){
+						isSecondPlayerConnected = true;
+						let info = data.message.split(" ");
+						oponentId = parseInt(info[1]);
+						let alertInfo = info[0]+" connected!";
+						document.getElementById("player2").innerHTML = info[0];
+						document.getElementById("chatBox").innerHTML = '';
+						document.getElementById("blockDiv").style.display = "none";
+						Swal.fire(
+						  'Good job!',
+						  alertInfo,
+						  'success'
+						)
+					}else{
+						document.getElementById("chatBox").innerHTML += data.sender + ": "+data.message+"a";			
+					}
+					
+				})
+			})
+		}
+		
+		function prepareMessage(){
+			if(isSecondPlayerConnected){
+				let message = document.getElementById("messageBox").value;
+				if(message == null || message ===''){
+					Swal.fire(
+					  'Error',
+					  'Please provide a message',
+					  'error'
+					)
+				}else{
+					document.getElementById("messageBox").value = '';
+					sendMessage(message);
+				}
+			}else{
+				Swal.fire(
+				  'Error',
+				  'Please wait for second player to connect',
+				  'error'
+				)
+			}
+		}
+		
+		function sendMessage(content){
+			let login = document.getElementById("login").value;
+			$.ajax({
+				url: url + "/game/sendMessage",
+				type: 'POST',
+				dataType: "json",
+				contentType: "application/json",
+				data : JSON.stringify({
+					"message": content,
+					"sender" : login,
+					"recievierId" : oponentId
+				}),
+				success: function(data){
+					console.log("message send");
+					if(isFirstPlayerConnected)
+						document.getElementById("chatBox").innerHTML += login + ": "+content+"a";
+					else{
+						isFirstPlayerConnected = true;
+					}
+				},
+				error: function(error){
+					console.log(error);
+				}
+			})
+		}
   	</script>
-  	<script>
+  	<script>	
   		(function() {
+  			playerId = document.getElementById("id").value;
   			let action = document.getElementById("action").value;
   			if(action == "create")
   				create();
