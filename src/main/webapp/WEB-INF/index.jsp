@@ -75,6 +75,23 @@
 				cursor: pointer;
 			  	background: #e6e6e6;
 			}
+			
+			.avaibleMove{
+				background-color: #FF8C00;
+			}
+			
+			.avaibleAttack{
+				background-color: #DC143C;
+			}
+			
+			.avaibleWhite{
+				background-color: #ffddb3;
+			}
+			
+			.avaibleBlack{
+				background-color: #ffaf4d;
+			}
+			
 		</style>
 	    <!--    libs for stomp and sockjs-->
 	    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
@@ -255,6 +272,7 @@
 		let prevVal, nextVal;
 		let piece;
 		let prevX, prevY, newY, newX;
+		var bottomColor;
 		
 		function assignSelectedClass(element){
 			if(element.classList.contains("white")){
@@ -282,6 +300,7 @@
 		}
 		
 		function selectPiece(element){
+
 			if((isWhite && (turn%2 == 1)) || (!isWhite && (turn%2 == 0))){
 				let tempY = parseInt(element.id.charAt(0));
 				let tempX = parseInt(element.id.charAt(2));
@@ -292,6 +311,7 @@
 							prevY = tempY;
 							prevX = tempX;
 							assignSelectedClass(element);
+							selectMove(board[tempY][tempX]);
 							isSelectedPrev = true;
 							prevVal = board[prevY][prevX];
 							console.log("prev:", prevY, prevX);
@@ -301,18 +321,900 @@
 					console.log("removing prev");
 					removeSelectedClass(element)
 					isSelectedPrev = false;
+					for(var i = 0; i < 8; i++) {
+						for(var j = 0; j < 8; j++) {
+							document.getElementById(i + "_" + j).classList.remove("avaibleWhite");
+							document.getElementById(i + "_" + j).classList.remove("avaibleBlack");
+							document.getElementById(i + "_" + j).classList.remove("avaibleAttack");
+						}
+					}
 				}else{
 					console.log("setting new")
 					nextVal = board[tempY][tempX];
-					if(nextVal == 0 || (prevVal < 0 && nextVal > 0) || (prevVal > 0 && nextVal < 0 )){
-						newY = tempY;
-						newX = tempX;
-						console.log("new", newY, newX);
-						isSelectedNew = true;
-						piece = getPiece(prevVal);
-						isTurn = false;
-						removeSelectedClass(document.getElementById(prevY+"_"+prevX));
-						makeMove(piece, newX, newY, prevX, prevY);
+					if(element.classList.contains("avaibleWhite") || element.classList.contains("avaibleBlack") || element.classList.contains("avaibleAttack"))
+						if(nextVal == 0 || (prevVal < 0 && nextVal > 0) || (prevVal > 0 && nextVal < 0 )){
+							newY = tempY;
+							newX = tempX;
+							console.log("new", newY, newX);
+							isSelectedNew = true;
+							piece = getPiece(prevVal);
+							isTurn = false;
+							removeSelectedClass(document.getElementById(prevY+"_"+prevX));
+							makeMove(piece, newX, newY, prevX, prevY);
+							for(var i = 0; i < 8; i++) {
+								for(var j = 0; j < 8; j++) {
+									document.getElementById(i + "_" + j).classList.remove("avaibleWhite");
+									document.getElementById(i + "_" + j).classList.remove("avaibleBlack");
+									document.getElementById(i + "_" + j).classList.remove("avaibleAttack");
+								}
+							}
+						}
+				}
+			}
+		}
+		
+		function addMoveClass(element) {
+			if(element.classList.contains("white")) {
+				element.classList.add("avaibleWhite");
+			}
+			else {
+				element.classList.add("avaibleBlack");
+			}
+		}
+		
+		
+		function movePawn(value){
+			if(bottomColor == 1) {
+				if(prevY - 1 >= 0) {
+					if(board[prevY - 1][prevX] == 0 && turn %2 == 1) {
+						addMoveClass(document.getElementById((prevY - 1) + "_" + (prevX)));
+					}
+					if(prevX - 1 >= 0) {
+						if(board[prevY - 1][prevX - 1] < 0 && turn %2 == 1) {
+							document.getElementById((prevY - 1) + "_" + (prevX - 1)).classList.add("avaibleAttack");
+						}
+					}
+					if(prevX + 1 < 8) {
+						if(board[prevY - 1][prevX + 1] < 0 && turn %2 == 1) {
+							document.getElementById((prevY - 1) + "_" + (prevX + 1)).classList.add("avaibleAttack");
+						}
+					}
+				}
+				if(prevY + 1 < 8) {
+					if(board[prevY + 1][prevX] == 0 && turn %2 == 0) {
+						addMoveClass(document.getElementById((prevY + 1) + "_" + (prevX)));
+					}
+					if(prevX - 1 >= 0) {
+						if(board[prevY + 1][prevX - 1] > 0 && turn %2 == 0) {
+							document.getElementById((prevY + 1) + "_" + (prevX - 1)).classList.add("avaibleAttack");
+						}
+					}
+					if(prevX + 1 < 8) {
+						if(board[prevY + 1][prevX + 1] > 0 && turn %2 == 0) {
+							document.getElementById((prevY + 1) + "_" + (prevX + 1)).classList.add("avaibleAttack");
+						}
+					}
+				}
+				if(prevY == 6 && turn %2 == 1) {
+					if(board[prevY - 1][prevX] == 0 && board[prevY - 2][prevX] == 0) {
+						addMoveClass(document.getElementById((prevY - 2) + "_" + (prevX)));
+					}
+				}
+				if(prevY == 1 && turn %2 == 0) {
+					if(board[prevY + 1][prevX] == 0 && board[prevY + 2][prevX] == 0) {
+							addMoveClass(document.getElementById((prevY + 2) + "_" + (prevX)));
+					}
+				}
+			}
+			else {
+				if(prevY - 1 >= 0) {
+					if(board[prevY - 1][prevX] == 0 && turn %2 == 0) {
+						addMoveClass(document.getElementById((prevY - 1) + "_" + (prevX)));
+					}
+					if(prevX - 1 >= 0) {
+						if(board[prevY - 1][prevX - 1] > 0 && turn %2 == 0) {
+							document.getElementById((prevY - 1) + "_" + (prevX - 1)).classList.add("avaibleAttack");
+						}
+					}
+					if(prevX + 1 < 8) {
+						if(board[prevY - 1][prevX + 1] > 0 && turn %2 == 0) {
+							document.getElementById((prevY - 1) + "_" + (prevX + 1)).classList.add("avaibleAttack");
+						}
+					}
+				}
+				if(prevY + 1 < 8) {
+					if(board[prevY + 1][prevX] == 0 && turn %2 == 1) {
+						addMoveClass(document.getElementById((prevY + 1) + "_" + (prevX)));
+					}
+					if(prevX - 1 >= 0) {
+						if(board[prevY + 1][prevX - 1] < 0 && turn %2 == 1) {
+							document.getElementById((prevY + 1) + "_" + (prevX - 1)).classList.add("avaibleAttack");
+						}
+					}
+					if(prevX + 1 < 8) {
+						if(board[prevY + 1][prevX + 1] < 0 && turn %2 == 1) {
+							document.getElementById((prevY + 1) + "_" + (prevX + 1)).classList.add("avaibleAttack");
+						}
+					}
+				}
+				if(prevY == 6 && turn %2 == 0) {
+					if(board[prevY - 1][prevX] == 0 && board[prevY - 2][prevX] == 0) {
+						addMoveClass(document.getElementById((prevY - 2) + "_" + (prevX)));
+					}
+				}
+				if(prevY == 1 && turn %2 == 1) {
+					if(board[prevY + 1][prevX] == 0 && board[prevY + 2][prevX] == 0) {
+							addMoveClass(document.getElementById((prevY + 2) + "_" + (prevX)));
+					}
+				}
+			}
+		}
+		
+		function moveRook(value){
+			for(var y = prevY - 1; y >= 0; y--) {
+				if(board[y][prevX] == 0) {
+					addMoveClass(document.getElementById((y) + "_" + (prevX)));
+				}
+				else {
+					break;
+				}
+			}
+			for(var y = prevY + 1; y < 8; y++) {
+				if(board[y][prevX] == 0) {
+					addMoveClass(document.getElementById((y) + "_" + (prevX)));
+				}
+				else {
+					break;
+				}
+			}
+			for(var x = prevX - 1; x >= 0; x--) {
+				if(board[prevY][x] == 0) {
+					addMoveClass(document.getElementById((prevY) + "_" + (x)));
+				}
+				else {
+					break;
+				}
+			}
+			for(var x = prevX + 1; x < 8; x++) {
+				if(board[prevY][x] == 0) {
+					addMoveClass(document.getElementById((prevY) + "_" + (x)));
+				}
+				else {
+					break;
+				}
+			}
+			
+			//attack
+			for(var y = prevY - 1; y >= 0; y--) {
+				if(turn %2 == 1 && board[y][prevX] < 0) {
+					if(y + 1 < 8) {
+						if(board[y + 1][prevX] >= 0) {
+							document.getElementById((y) + "_" + (prevX)).classList.add("avaibleAttack");
+							break;
+						}
+					}
+				}
+				else if(turn %2 == 0 && board[y][prevX] > 0){
+					if(y + 1 < 8) {
+						if(board[y + 1][prevX] <= 0) {
+							document.getElementById((y) + "_" + (prevX)).classList.add("avaibleAttack");
+							break;
+						}
+					}
+				}
+				else if(turn %2 == 1 && board[y][prevX] > 0) {
+					break;
+				}
+				else if(turn %2 == 0 && board[y][prevX] < 0) {
+					break;
+				}
+			}
+			for(var y = prevY + 1; y < 8; y++) {
+				if(turn %2 == 1 && board[y][prevX] < 0) {
+					if(y - 1 >= 0) {
+						if(board[y - 1][prevX] >= 0) {
+							document.getElementById((y) + "_" + (prevX)).classList.add("avaibleAttack");
+							break;
+						}
+					}
+				}
+				else if(turn %2 == 0 && board[y][prevX] > 0) {
+					if(y - 1 >= 0) {
+						if(board[y - 1][prevX] <= 0) {
+							document.getElementById((y) + "_" + (prevX)).classList.add("avaibleAttack");
+							break;
+						}
+					}
+				}
+				else if(turn %2 == 1 && board[y][prevX] > 0) {
+					break;
+				}
+				else if(turn %2 == 0 && board[y][prevX] < 0) {
+					break;
+				}
+			}
+			for(var x = prevX - 1; x >= 0; x--) {
+				if(turn %2 == 1 && board[prevY][x] < 0) {
+					if(x + 1 < 8) {
+						if(board[prevY][x + 1] >= 0) {
+							document.getElementById((prevY) + "_" + (x)).classList.add("avaibleAttack");
+							break;
+						}
+					}
+				}
+				else if(turn %2 == 0 && board[prevY][x] > 0) {
+					if(x + 1 < 8) {
+						if(board[prevY][x + 1] <= 0) {
+							document.getElementById((prevY) + "_" + (x)).classList.add("avaibleAttack");
+							break;
+						}
+					}
+				}
+				else if(turn %2 == 1 && board[prevY][x] > 0) {
+					break;
+				}
+				else if(turn %2 == 0 && board[prevY][x] < 0) {
+					break;
+				}
+			}
+			for(var x = prevX + 1; x < 8; x++) {
+				if(turn %2 == 1 && board[prevY][x] < 0) {
+					if(x - 1 >= 0) {
+						if(board[prevY][x - 1] >= 0) {
+							document.getElementById((prevY) + "_" + (x)).classList.add("avaibleAttack");
+							break;
+						}
+					}
+					document.getElementById((prevY) + "_" + (x)).classList.add("avaibleAttack");
+					break;
+				}
+				else if(turn %2 == 0 && board[prevY][x] > 0) {
+					if(x - 1 >= 0) {
+						if(board[prevY][x - 1] <= 0) {
+							document.getElementById((prevY) + "_" + (x)).classList.add("avaibleAttack");
+							break;
+						}
+					}
+				}
+				else if(turn %2 == 1 && board[prevY][x] > 0) {
+					break;
+				}
+				else if(turn %2 == 0 && board[prevY][x] < 0) {
+					break;
+				}
+			}
+			
+		}
+		
+		function moveKnight(value){
+			if(prevY - 2 >= 0) {
+				if(prevX - 1 >= 0) {
+					if(board[prevY - 2][prevX - 1] == 0) {
+						addMoveClass(document.getElementById((prevY - 2) + "_" + (prevX - 1)));
+					}
+					else if(turn %2 == 1 && board[prevY - 2][prevX - 1] < 0) {
+						document.getElementById((prevY - 2) + "_" + (prevX - 1)).classList.add("avaibleAttack");
+					}
+					else if(turn %2 == 0 && board[prevY - 2][prevX - 1] > 0) {
+						document.getElementById((prevY - 2) + "_" + (prevX - 1)).classList.add("avaibleAttack");
+					}
+				}
+				if(prevX + 1 < 8) {
+					if(board[prevY - 2][prevX + 1] == 0) {
+						addMoveClass(document.getElementById((prevY - 2) + "_" + (prevX + 1)));
+					}
+					else if(turn %2 == 1 && board[prevY - 2][prevX + 1] < 0) {
+						document.getElementById((prevY - 2) + "_" + (prevX + 1)).classList.add("avaibleAttack");
+					}
+					else if(turn %2 == 0 && board[prevY - 2][prevX + 1] > 0) {
+						document.getElementById((prevY - 2) + "_" + (prevX + 1)).classList.add("avaibleAttack");
+					}
+				}
+			}
+			if(prevY + 2 < 8) {
+				if(prevX - 1 >= 0) {
+					if(board[prevY + 2][prevX - 1] == 0) {
+						addMoveClass(document.getElementById((prevY + 2) + "_" + (prevX - 1)));
+					}
+					else if(turn %2 == 1 && board[prevY + 2][prevX - 1] < 0) {
+						document.getElementById((prevY + 2) + "_" + (prevX - 1)).classList.add("avaibleAttack");
+					}
+					else if(turn %2 == 0 && board[prevY + 2][prevX - 1] > 0) {
+						document.getElementById((prevY + 2) + "_" + (prevX - 1)).classList.add("avaibleAttack");
+					}
+				}
+				if(prevX + 1 < 8) {
+					if(board[prevY + 2][prevX + 1] == 0) {
+						addMoveClass(document.getElementById((prevY + 2) + "_" + (prevX + 1)));
+					}
+					else if(turn %2 == 1 && board[prevY + 2][prevX + 1] < 0) {
+						document.getElementById((prevY + 2) + "_" + (prevX + 1)).classList.add("avaibleAttack");
+					}
+					else if(turn %2 == 0 && board[prevY + 2][prevX + 1] > 0) {
+						document.getElementById((prevY + 2) + "_" + (prevX + 1)).classList.add("avaibleAttack");
+					}
+				}
+			}
+			if(prevX - 2 >= 0) {
+				if(prevY - 1 >= 0) {
+					if(board[prevY - 1][prevX - 2] == 0) {
+						addMoveClass(document.getElementById((prevY - 1) + "_" + (prevX - 2)));
+					}
+					else if(turn %2 == 1 && board[prevY - 1][prevX - 2] < 0) {
+						document.getElementById((prevY - 1) + "_" + (prevX - 2)).classList.add("avaibleAttack");
+					}
+					else if(turn %2 == 0 && board[prevY - 1][prevX - 2] > 0) {
+						document.getElementById((prevY - 1) + "_" + (prevX - 2)).classList.add("avaibleAttack");
+					}
+				}
+				if(prevY + 1 < 8) {
+					if(board[prevY + 1][prevX - 2] == 0) {
+						addMoveClass(document.getElementById((prevY + 1) + "_" + (prevX - 2)));
+					}
+					else if(turn %2 == 1 && board[prevY + 1][prevX - 2] < 0) {
+						document.getElementById((prevY + 1) + "_" + (prevX - 2)).classList.add("avaibleAttack");
+					}
+					else if(turn %2 == 0 && board[prevY + 1][prevX - 2] > 0) {
+						document.getElementById((prevY + 1) + "_" + (prevX - 2)).classList.add("avaibleAttack");
+					}
+				}
+			}
+			if(prevX + 2 < 8) {
+				if(prevY - 1 >= 0) {
+					if(board[prevY - 1][prevX + 2] == 0) {
+						addMoveClass(document.getElementById((prevY - 1) + "_" + (prevX + 2)));
+					}
+					else if(turn %2 == 1 && board[prevY - 1][prevX + 2] < 0) {
+						document.getElementById((prevY - 1) + "_" + (prevX + 2)).classList.add("avaibleAttack");
+					}
+					else if(turn %2 == 0 && board[prevY - 1][prevX + 2] > 0) {
+						document.getElementById((prevY - 1) + "_" + (prevX + 2)).classList.add("avaibleAttack");
+					}
+				}
+				if(prevY + 1 < 8) {
+					if(board[prevY + 1][prevX + 2] == 0) {
+						addMoveClass(document.getElementById((prevY + 1) + "_" + (prevX + 2)));
+					}
+					else if(turn %2 == 1 && board[prevY + 1][prevX + 2] < 0) {
+						document.getElementById((prevY + 1) + "_" + (prevX + 2)).classList.add("avaibleAttack");
+					}
+					else if(turn %2 == 0 && board[prevY + 1][prevX + 2] > 0) {
+						document.getElementById((prevY + 1) + "_" + (prevX + 2)).classList.add("avaibleAttack");
+					}
+				}
+			}
+		}
+		
+		function moveBishop(value){
+			var temp = 0;
+			for(var y = prevY - 1; y >= 0; y--) {
+				for(var x = prevX - 1; x >= 0; x--) {
+					if(x - y == prevX - prevY) {
+						if(turn %2 == 1 && board[y][x] < 0) {
+							document.getElementById((y) + "_" + (x)).classList.add("avaibleAttack");
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 0 && board[y][x] > 0) {
+							document.getElementById((y) + "_" + (x)).classList.add("avaibleAttack");
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 1 && board[y][x] > 0) {
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 0 && board[y][x] < 0) {
+							temp = 1;
+							break;
+						}
+						else if(board[y][x] == 0) {
+							addMoveClass(document.getElementById((y) + "_" + (x)));
+						}
+					}
+				}
+				if(temp == 1) {
+					temp = 0;
+					break;
+				}
+			}
+			for(var y = prevY - 1; y >= 0; y--) {
+				for(var x = prevX + 1; x < 8; x++) {
+					if(x + y == prevX + prevY) {
+						if(turn %2 == 1 && board[y][x] < 0) {
+							document.getElementById((y) + "_" + (x)).classList.add("avaibleAttack");
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 0 && board[y][x] > 0) {
+							document.getElementById((y) + "_" + (x)).classList.add("avaibleAttack");
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 1 && board[y][x] > 0) {
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 0 && board[y][x] < 0) {
+							temp = 1;
+							break;
+						}
+						else if(board[y][x] == 0) {
+							addMoveClass(document.getElementById((y) + "_" + (x)));
+						}
+					}
+				}
+				if(temp == 1) {
+					temp = 0;
+					break;
+				}
+			}
+			for(var y = prevY + 1; y < 8; y++) {
+				for(var x = prevX - 1; x >= 0; x--) {
+					if(x + y == prevX + prevY) {
+						if(turn %2 == 1 && board[y][x] < 0) {
+							document.getElementById((y) + "_" + (x)).classList.add("avaibleAttack");
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 0 && board[y][x] > 0) {
+							document.getElementById((y) + "_" + (x)).classList.add("avaibleAttack");
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 1 && board[y][x] > 0) {
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 0 && board[y][x] < 0) {
+							temp = 1;
+							break;
+						}
+						else if(board[y][x] == 0) {
+							addMoveClass(document.getElementById((y) + "_" + (x)));
+						}
+					}
+				}
+				if(temp == 1) {
+					temp = 0;
+					break;
+				}
+			}
+			for(var y = prevY + 1; y < 8; y++) {
+				for(var x = prevX + 1; x < 8; x++) {
+					if(x - y == prevX - prevY) {
+						if(turn %2 == 1 && board[y][x] < 0) {
+							document.getElementById((y) + "_" + (x)).classList.add("avaibleAttack");
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 0 && board[y][x] > 0) {
+							document.getElementById((y) + "_" + (x)).classList.add("avaibleAttack");
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 1 && board[y][x] > 0) {
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 0 && board[y][x] < 0) {
+							temp = 1;
+							break;
+						}
+						else if(board[y][x] == 0) {
+							addMoveClass(document.getElementById((y) + "_" + (x)));
+						}
+					}
+				}
+				if(temp == 1) {
+					temp = 0;
+					break;
+				}
+			}
+		}
+		
+		function moveQueen(value){
+			for(var y = prevY - 1; y >= 0; y--) {
+				if(board[y][prevX] == 0) {
+					addMoveClass(document.getElementById((y) + "_" + (prevX)));
+				}
+				else {
+					break;
+				}
+			}
+			for(var y = prevY + 1; y < 8; y++) {
+				if(board[y][prevX] == 0) {
+					addMoveClass(document.getElementById((y) + "_" + (prevX)));
+				}
+				else {
+					break;
+				}
+			}
+			for(var x = prevX - 1; x >= 0; x--) {
+				if(board[prevY][x] == 0) {
+					addMoveClass(document.getElementById((prevY) + "_" + (x)));
+				}
+				else {
+					break;
+				}
+			}
+			for(var x = prevX + 1; x < 8; x++) {
+				if(board[prevY][x] == 0) {
+					addMoveClass(document.getElementById((prevY) + "_" + (x)));
+				}
+				else {
+					break;
+				}
+			}
+			
+			//attack
+			for(var y = prevY - 1; y >= 0; y--) {
+				if(turn %2 == 1 && board[y][prevX] < 0) {
+					if(y + 1 < 8) {
+						if(board[y + 1][prevX] >= 0) {
+							document.getElementById((y) + "_" + (prevX)).classList.add("avaibleAttack");
+							break;
+						}
+					}
+				}
+				else if(turn %2 == 0 && board[y][prevX] > 0){
+					if(y + 1 < 8) {
+						if(board[y + 1][prevX] <= 0) {
+							document.getElementById((y) + "_" + (prevX)).classList.add("avaibleAttack");
+							break;
+						}
+					}
+				}
+				else if(turn %2 == 1 && board[y][prevX] > 0) {
+					break;
+				}
+				else if(turn %2 == 0 && board[y][prevX] < 0) {
+					break;
+				}
+			}
+			for(var y = prevY + 1; y < 8; y++) {
+				if(turn %2 == 1 && board[y][prevX] < 0) {
+					if(y - 1 >= 0) {
+						if(board[y - 1][prevX] >= 0) {
+							document.getElementById((y) + "_" + (prevX)).classList.add("avaibleAttack");
+							break;
+						}
+					}
+				}
+				else if(turn %2 == 0 && board[y][prevX] > 0) {
+					if(y - 1 >= 0) {
+						if(board[y - 1][prevX] <= 0) {
+							document.getElementById((y) + "_" + (prevX)).classList.add("avaibleAttack");
+							break;
+						}
+					}
+				}
+				else if(turn %2 == 1 && board[y][prevX] > 0) {
+					break;
+				}
+				else if(turn %2 == 0 && board[y][prevX] < 0) {
+					break;
+				}
+			}
+			for(var x = prevX - 1; x >= 0; x--) {
+				if(turn %2 == 1 && board[prevY][x] < 0) {
+					if(x + 1 < 8) {
+						if(board[prevY][x + 1] >= 0) {
+							document.getElementById((prevY) + "_" + (x)).classList.add("avaibleAttack");
+							break;
+						}
+					}
+				}
+				else if(turn %2 == 0 && board[prevY][x] > 0) {
+					if(x + 1 < 8) {
+						if(board[prevY][x + 1] <= 0) {
+							document.getElementById((prevY) + "_" + (x)).classList.add("avaibleAttack");
+							break;
+						}
+					}
+				}
+				else if(turn %2 == 1 && board[prevY][x] > 0) {
+					break;
+				}
+				else if(turn %2 == 0 && board[prevY][x] < 0) {
+					break;
+				}
+			}
+			for(var x = prevX + 1; x < 8; x++) {
+				if(turn %2 == 1 && board[prevY][x] < 0) {
+					if(x - 1 >= 0) {
+						if(board[prevY][x - 1] >= 0) {
+							document.getElementById((prevY) + "_" + (x)).classList.add("avaibleAttack");
+							break;
+						}
+					}
+					document.getElementById((prevY) + "_" + (x)).classList.add("avaibleAttack");
+					break;
+				}
+				else if(turn %2 == 0 && board[prevY][x] > 0) {
+					if(x - 1 >= 0) {
+						if(board[prevY][x - 1] <= 0) {
+							document.getElementById((prevY) + "_" + (x)).classList.add("avaibleAttack");
+							break;
+						}
+					}
+				}
+				else if(turn %2 == 1 && board[prevY][x] > 0) {
+					break;
+				}
+				else if(turn %2 == 0 && board[prevY][x] < 0) {
+					break;
+				}
+			}
+			var temp = 0;
+			for(var y = prevY - 1; y >= 0; y--) {
+				for(var x = prevX - 1; x >= 0; x--) {
+					if(x - y == prevX - prevY) {
+						if(turn %2 == 1 && board[y][x] < 0) {
+							document.getElementById((y) + "_" + (x)).classList.add("avaibleAttack");
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 0 && board[y][x] > 0) {
+							document.getElementById((y) + "_" + (x)).classList.add("avaibleAttack");
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 1 && board[y][x] > 0) {
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 0 && board[y][x] < 0) {
+							temp = 1;
+							break;
+						}
+						else if(board[y][x] == 0) {
+							addMoveClass(document.getElementById((y) + "_" + (x)));
+						}
+					}
+				}
+				if(temp == 1) {
+					temp = 0;
+					break;
+				}
+			}
+			for(var y = prevY - 1; y >= 0; y--) {
+				for(var x = prevX + 1; x < 8; x++) {
+					if(x + y == prevX + prevY) {
+						if(turn %2 == 1 && board[y][x] < 0) {
+							document.getElementById((y) + "_" + (x)).classList.add("avaibleAttack");
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 0 && board[y][x] > 0) {
+							document.getElementById((y) + "_" + (x)).classList.add("avaibleAttack");
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 1 && board[y][x] > 0) {
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 0 && board[y][x] < 0) {
+							temp = 1;
+							break;
+						}
+						else if(board[y][x] == 0) {
+							addMoveClass(document.getElementById((y) + "_" + (x)));
+						}
+					}
+				}
+				if(temp == 1) {
+					temp = 0;
+					break;
+				}
+			}
+			for(var y = prevY + 1; y < 8; y++) {
+				for(var x = prevX - 1; x >= 0; x--) {
+					if(x + y == prevX + prevY) {
+						if(turn %2 == 1 && board[y][x] < 0) {
+							document.getElementById((y) + "_" + (x)).classList.add("avaibleAttack");
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 0 && board[y][x] > 0) {
+							document.getElementById((y) + "_" + (x)).classList.add("avaibleAttack");
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 1 && board[y][x] > 0) {
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 0 && board[y][x] < 0) {
+							temp = 1;
+							break;
+						}
+						else if(board[y][x] == 0) {
+							addMoveClass(document.getElementById((y) + "_" + (x)));
+						}
+					}
+				}
+				if(temp == 1) {
+					temp = 0;
+					break;
+				}
+			}
+			for(var y = prevY + 1; y < 8; y++) {
+				for(var x = prevX + 1; x < 8; x++) {
+					if(x - y == prevX - prevY) {
+						if(turn %2 == 1 && board[y][x] < 0) {
+							document.getElementById((y) + "_" + (x)).classList.add("avaibleAttack");
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 0 && board[y][x] > 0) {
+							document.getElementById((y) + "_" + (x)).classList.add("avaibleAttack");
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 1 && board[y][x] > 0) {
+							temp = 1;
+							break;
+						}
+						else if(turn %2 == 0 && board[y][x] < 0) {
+							temp = 1;
+							break;
+						}
+						else if(board[y][x] == 0) {
+							addMoveClass(document.getElementById((y) + "_" + (x)));
+						}
+					}
+				}
+				if(temp == 1) {
+					temp = 0;
+					break;
+				}
+			}
+		}
+		
+		function moveKing(value){
+			if(prevY - 1 >= 0) {
+				if(turn %2 == 1) {
+					if(board[prevY - 1][prevX] == 0) {
+						addMoveClass(document.getElementById((prevY - 1) + "_" + (prevX)));
+					}
+					else if(board[prevY - 1][prevX] < 0) {
+						document.getElementById((prevY - 1) + "_" + (prevX)).classList.add("avaibleAttack");
+					}
+				}
+				else {
+					if(board[prevY - 1][prevX] == 0) {
+						addMoveClass(document.getElementById((prevY - 1) + "_" + (prevX)));
+					}
+					else if(board[prevY - 1][prevX] > 0) {
+						document.getElementById((prevY - 1) + "_" + (prevX)).classList.add("avaibleAttack");
+					}
+				}
+				if(prevX - 1 >= 0) {
+					if(turn %2 == 1) {
+						if(board[prevY - 1][prevX - 1] == 0) {
+							addMoveClass(document.getElementById((prevY - 1) + "_" + (prevX - 1)));
+						}
+						else if(board[prevY - 1][prevX - 1] < 0) {
+							document.getElementById((prevY - 1) + "_" + (prevX - 1)).classList.add("avaibleAttack");
+						}
+					}
+					else {
+						if(board[prevY - 1][prevX - 1] == 0) {
+							addMoveClass(document.getElementById((prevY - 1) + "_" + (prevX - 1)));
+						}
+						else if(board[prevY - 1][prevX - 1] > 0) {
+							document.getElementById((prevY - 1) + "_" + (prevX - 1)).classList.add("avaibleAttack");
+						}
+					}
+				}
+				if(prevX + 1 < 8) {
+					if(turn %2 == 1) {
+						if(board[prevY - 1][prevX + 1] == 0) {
+							addMoveClass(document.getElementById((prevY - 1) + "_" + (prevX + 1)));
+						}
+						else if(board[prevY - 1][prevX + 1] < 0) {
+							document.getElementById((prevY - 1) + "_" + (prevX + 1)).classList.add("avaibleAttack");
+						}
+					}
+					else {
+						if(board[prevY - 1][prevX + 1] == 0) {
+							addMoveClass(document.getElementById((prevY - 1) + "_" + (prevX + 1)));
+						}
+						else if(board[prevY - 1][prevX + 1] > 0) {
+							document.getElementById((prevY - 1) + "_" + (prevX + 1)).classList.add("avaibleAttack");
+						}
+					}
+				}
+			}
+			if(prevY + 1 < 8) {
+				if(turn %2 == 1) {
+					if(board[prevY + 1][prevX] == 0) {
+						addMoveClass(document.getElementById((prevY + 1) + "_" + (prevX)));
+					}
+					else if(board[prevY + 1][prevX] < 0) {
+						document.getElementById((prevY + 1) + "_" + (prevX)).classList.add("avaibleAttack");
+					}
+				}
+				else {
+					if(board[prevY + 1][prevX] == 0) {
+						addMoveClass(document.getElementById((prevY + 1) + "_" + (prevX)));
+					}
+					else if(board[prevY + 1][prevX] > 0) {
+						document.getElementById((prevY + 1) + "_" + (prevX)).classList.add("avaibleAttack");
+					}
+				}
+				if(prevX - 1 >= 0) {
+					if(turn %2 == 1) {
+						if(board[prevY + 1][prevX - 1] == 0) {
+							addMoveClass(document.getElementById((prevY + 1) + "_" + (prevX - 1)));
+						}
+						else if(board[prevY + 1][prevX - 1] < 0) {
+							document.getElementById((prevY + 1) + "_" + (prevX - 1)).classList.add("avaibleAttack");
+						}
+					}
+					else {
+						if(board[prevY + 1][prevX - 1] == 0) {
+							addMoveClass(document.getElementById((prevY + 1) + "_" + (prevX - 1)));
+						}
+						else if(board[prevY + 1][prevX - 1] > 0) {
+							document.getElementById((prevY + 1) + "_" + (prevX - 1)).classList.add("avaibleAttack");
+						}
+					}
+				}
+				if(prevX + 1 < 8) {
+					if(turn %2 == 1) {
+						if(board[prevY + 1][prevX + 1] == 0) {
+							addMoveClass(document.getElementById((prevY + 1) + "_" + (prevX + 1)));
+						}
+						else if(board[prevY + 1][prevX + 1] < 0) {
+							document.getElementById((prevY + 1) + "_" + (prevX + 1)).classList.add("avaibleAttack");
+						}
+					}
+					else {
+						if(board[prevY + 1][prevX + 1] == 0) {
+							addMoveClass(document.getElementById((prevY + 1) + "_" + (prevX + 1)));
+						}
+						else if(board[prevY + 1][prevX + 1] > 0) {
+							document.getElementById((prevY + 1) + "_" + (prevX + 1)).classList.add("avaibleAttack");
+						}
+					}
+				}
+			}
+			if(prevX - 1 >= 0) {
+				if(turn %2 == 1) {
+					if(board[prevY][prevX - 1] == 0) {
+						addMoveClass(document.getElementById((prevY) + "_" + (prevX - 1)));
+					}
+					else if(board[prevY][prevX - 1] < 0) {
+						document.getElementById((prevY) + "_" + (prevX - 1)).classList.add("avaibleAttack");
+					}
+				}
+				else {
+					if(board[prevY][prevX - 1] == 0) {
+						addMoveClass(document.getElementById((prevY) + "_" + (prevX - 1)));
+					}
+					else if(board[prevY][prevX - 1] > 0) {
+						document.getElementById((prevY) + "_" + (prevX - 1)).classList.add("avaibleAttack");
+					}
+				}
+			}
+			if(prevX + 1 < 8) {
+				if(turn %2 == 1) {
+					if(board[prevY][prevX + 1] == 0) {
+						addMoveClass(document.getElementById((prevY) + "_" + (prevX + 1)));
+					}
+					else if(board[prevY][prevX + 1] < 0) {
+						document.getElementById((prevY) + "_" + (prevX + 1)).classList.add("avaibleAttack");
+					}
+				}
+				else {
+					if(board[prevY][prevX + 1] == 0) {
+						addMoveClass(document.getElementById((prevY) + "_" + (prevX + 1)));
+					}
+					else if(board[prevY][prevX + 1] > 0) {
+						document.getElementById((prevY) + "_" + (prevX + 1)).classList.add("avaibleAttack");
 					}
 				}
 			}
@@ -321,13 +1223,32 @@
 		function selectMove(value){
 			switch(value) {
 				case 1:
+				case -1:
+					movePawn(value);
 				break;
 				case 2:
+				case -2:
+					moveRook(value);
 				break;
-				
+				case 3:
+				case -3:
+					moveKnight(value);
+				break;
+				case 4:
+				case -4:
+					moveBishop(value);
+				break;
+				case 5:
+				case -5:
+					moveQueen(value);
+				break;
+				case 6:
+				case -6:
+					moveKing(value);
+				break;
 			}
 		}
-		
+
 		const url = 'http://localhost:8080';
 		let stompClient;
 		let gameId;
@@ -366,6 +1287,10 @@
 						gameId = data.gameId;
 						
 						isWhite = data.player1White;
+						if(isWhite)
+							bottomColor = 1;
+						else
+							bottomColor = -1;
 						refreshView(data)
 						
 						connectToSocket(gameId);
@@ -401,6 +1326,10 @@
 						gameId = data.gameId;
 						
 						isWhite = !data.player1White;
+						if(isWhite)
+							bottomColor = -1;
+						else
+							bottomColor = 1;
 						refreshView(data)
 						
 						connectToSocket(gameId);
@@ -430,6 +1359,10 @@
 						gameId = data.gameId;
 						
 						isWhite = !data.player1White;
+						if(isWhite)
+							bottomColor = -1;
+						else
+							bottomColor = 1;
 						refreshView(data)
 						
 						connectToSocket(gameId);
@@ -500,6 +1433,6 @@
 				}
 			}
 		}
-  	</script>
+  		</script>
 	</body>
 </html> 

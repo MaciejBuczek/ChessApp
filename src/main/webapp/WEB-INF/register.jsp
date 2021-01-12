@@ -1,62 +1,110 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<style>
-		body {font-family: Arial, Helvetica, sans-serif;}
-		form {border: 3px solid #f1f1f1;}
-		
-		input[type=text], input[type=password] {
-		  width: 100%;
-		  padding: 12px 20px;
-		  margin: 8px 0;
-		  display: inline-block;
-		  border: 1px solid #ccc;
-		  box-sizing: border-box;
-		}
-		
-		button {
-		  background-color: #4CAF50;
-		  color: white;
-		  padding: 14px 20px;
-		  margin: 8px 0;
-		  border: none;
-		  cursor: pointer;
-		  width: 100%;
-		}
-		
-		button:hover {
-		  opacity: 0.8;
-		}
-		
-		.container {
-		  padding: 16px;
-		}
-		
-		span.psw {
-		  float: right;
-		}
+			body {
+				background-color: #343a40;
+				color: white;
+				margin: 0 auto;
+				padding: 0 auto;
+			}
+			
+			h2 {
+				font-size: 64px;
+				text-align: center;
+			}
+			
+			input[type=text], input[type=password] {
+			  width: 100%;
+			  padding: 12px 20px;
+			  margin: 8px 0;
+			  display: inline-block;
+			  border: 1px solid #ccc;
+			  box-sizing: border-box;
+			}
+			
+			#footer {
+	            position:fixed;
+	            bottom:0;
+	            background-color:#22262a;
+	            width:100%;
+	            padding:15px;
+	            color:white;
+	            font-size:20px;
+	            
+	        }
+	        
+			#nav{
+	            padding-bottom:20px;
+	            width:100%;
+	            background-color:#22262a;
+	            font-size:30px;
+	            height: 12vh;
+	        }
+	        
+	        #nav > h1{
+	            float:left;
+	            margin-left:50px;
+	        }
+	        
+	        #container {
+	        	padding: 16px;
+	        }
+	        
+	        #container > form {
+	        	font-size:28px;
+	        	border-style: solid;
+	        	border-radius: 25px;
+				background: #343a40;
+				padding: 20px;
+				margin: 40px;
+	        }
+	        
+	        button {
+		  		background-color: #4CAF50;
+			    color: white;
+			    padding: 14px 20px;
+			    margin: 8px 0;
+		  	    border: none;
+			    cursor: pointer;
+			    width: 100%;
+			}
+			
+			button:hover {
+				opacity: 0.8;
+			}
+			
+			a:visited {
+				color: #4CAF50;
+			}
+			
+			a {
+				color: #4CAF50;
+			}
+	        
 		</style>
 	</head>
 	<body>
-	
-	<h2>Register</h2>
-	
-		<form action="register" method="post">
-		  <div class="container">
-		    <label for="login"><b>Username</b></label>
-		    <input type="text" placeholder="Enter Username" name="login" required>
-		
-		    <label for="password"><b>Password</b></label>
-		    <input type="password" placeholder="Enter Password" name="password" required>
-		        
-		    <button type="submit">Register</button>
-		  </div>
-		
-		  <div class="container" style="background-color:#f1f1f1">
-		    <span class="psw">Back to <a href="/">Login</a></span>
-		  </div>
+		<div id = "nav">
+            <h1>ChessApp</h1>
+        </div>
+		<div id = "container">
+		<form action="/register" method="post">
+			<div>
+				<h2>Register</h2>
+			    <label for="login"><b>Username</b></label>
+			    <br />
+			    <input type="text" placeholder="Enter Username" name="login" required>
+				<br />
+			    <label for="password"><b>Password</b></label>
+			    <br />
+			    <input type="password" placeholder="Enter Password" name="password" required>
+			    <br />
+			    <button type="submit">Login</button>
+			</div>
+		    <span>Back to <a href="/">Login</a></span>
 		</form>
-	
+	</div>	
+	<div id = "footer">Created by Maciej Buczek & Kamil Galuszka 2020</div>
 	</body>
 </html>
